@@ -15,14 +15,13 @@ urls = [urlDpto, urlCasa]
 types = ['Apartment', 'House']
 subtypes = ['For rent', 'For sale']
 
-
 with open("zillow.csv", "w") as f:
     f.write("Tipo; Precio; Subtipo; Dirección\n")
 
-
 for url, tipo, subtype in zip(urls, types, subtypes):
     next_url = url
-    while next_url:
+    count = 0
+    while next_url and count < 100:
         data = requests.get(next_url, headers=header)
         soup = BeautifulSoup(data.text, 'lxml')
 
@@ -38,7 +37,10 @@ for url, tipo, subtype in zip(urls, types, subtypes):
 
         with open("zillow.csv", "a") as f:
             for i in range(len(pr)):
+                if count >= 100:
+                    break
                 f.write(tipo + "; " + str(pr[i]) + "; " + subtype + "; " + str(adr[i]) + "\n")
+                count += 1
 
         # Encuentra la URL de la siguiente página
         next_page = soup.find('a', {'rel':'next'})  # Busca un elemento 'a' con el atributo 'rel' establecido en 'next'
